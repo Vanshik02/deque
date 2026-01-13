@@ -1,79 +1,149 @@
-🛒 Smart Checkout System
+🛒 Deque – Smart Self-Checkout System
 
-A barcode-based cashless checkout web app that eliminates long billing queues in shopping malls.
+Deque is a smart self-checkout web application designed to reduce long billing queues in shopping malls by enabling customers to scan products, pay digitally, and exit securely without manual billing counters.
 
-Customers scan product barcodes, add items to a cart, pay using a virtual cashless wallet, and receive a QR code for exit verification.
+🚀 Problem Statement
 
-🚀 Features
+In shopping malls and supermarkets, customers often waste a lot of time standing in long billing queues. Traditional checkout systems are slow, manpower-dependent, and inefficient during peak hours.
 
-📷 1D Barcode scanning (EAN-13)
+💡 Our Solution
 
-🗄️ MongoDB product database
+Deque provides a self-checkout system where customers can:
 
-🛒 Real-time cart updates
+Scan product barcodes themselves
 
-💰 Cashless token / virtual wallet payment
+Automatically add items to a cart
 
-📱 QR code generation after payment
+Make a cashless payment
 
-🔐 Designed for anti-theft exit gate systems
+Generate a final verification QR code
 
-🌐 Fully web-based (no app required)
+Exit the store securely using RFID-based validation
 
-🧠 How It Works
+This removes the need for traditional billing counters and speeds up the shopping experience.
 
-Scan product barcode
+🔧 How Deque Works (Complete Flow)
+1️⃣ Product Scanning
 
-Product fetched from MongoDB
+Each product already has a standard EAN-13 barcode.
 
-Item added to cart
+The customer uses the web app to scan the barcode using the device camera.
 
-Pay using virtual wallet
+Once scanned, the product details (name and price) are fetched from a MongoDB database and added to the cart.
 
-QR code generated for verification
+2️⃣ Cart Management
 
-🏗️ Tech Stack
+All scanned items appear in a live cart.
 
-Frontend: HTML, CSS, JavaScript, QuaggaJS, QRCode.js
-Backend: Node.js, Express.js, MongoDB, Mongoose
+The total bill updates automatically.
 
-📁 Project Structure
-backend/
- ├── server.js
- └── models/Product.js
+If a product is scanned by mistake, it can be removed instantly before payment.
 
-frontend/
- ├── index.html
- ├── style.css
- └── script.js
+3️⃣ Cashless Payment
 
-🗄️ Database Format
+The system uses a cashless wallet/token system (simulated for prototype).
 
-Database: smartcheckout
-Collection: products
+On clicking Pay Now, the total amount is deducted from the wallet.
 
-{
-  "barcode": "1234567890128",
-  "name": "Milk Packet",
-  "price": 52
-}
+This simulates UPI/card-based digital payments without real transactions.
 
-⚙️ Run Locally
-cd backend
-npm install
-node server.js
+4️⃣ QR Code Generation
 
+After successful payment, the system generates a final QR code.
 
-Open frontend using Live Server or mobile browser.
+This QR code contains:
 
-💳 Payment Method
+Purchased product list
 
-Virtual cashless wallet (₹1000 initial balance)
+Total amount
 
-Safe for demos & hackathons
+Payment confirmation
 
-Can be replaced with real payment gateways
+Timestamp
 
-🎯 One-Line Pitch
+5️⃣ Exit Gate Verification (RFID Logic)
 
-“A smart, queue-less checkout system using barcode scanning, cashless payment, and QR-based exit verification.”
+At the store exit, a separate QR scanner scans the generated QR code.
+
+The exit system validates the transaction.
+
+RFID tags associated with the paid products are deactivated electronically.
+
+If an unpaid item is carried out, its RFID remains active and triggers the security alarm.
+
+In this prototype, RFID deactivation is simulated logically.
+In real deployment, this would be handled using RFID readers and deactivators connected via ESP32 or Raspberry Pi.
+
+🧠 Why This System is Secure
+
+Only items included in the final payment are allowed to exit.
+
+Unpaid items automatically trigger alarms.
+
+No manual verification required.
+
+Reduces theft and human error.
+
+🛠️ Tech Stack
+Frontend
+
+HTML
+
+CSS
+
+JavaScript
+
+QuaggaJS (Barcode scanning)
+
+QRCode.js (QR generation)
+
+Backend
+
+Node.js
+
+Express.js
+
+MongoDB (Product database)
+
+📦 Features
+
+📷 Real-time barcode scanning
+
+🧺 Dynamic cart management
+
+❌ Remove items before payment
+
+💰 Cashless wallet simulation
+
+🔐 Secure QR-based exit verification
+
+⚡ Fast and queue-less checkout
+
+🎯 Use Cases
+
+Shopping malls
+
+Supermarkets
+
+Retail stores
+
+College canteens
+
+Smart stores
+
+🔮 Future Enhancements
+
+Real payment gateway integration (UPI/Card)
+
+Actual RFID hardware integration
+
+Mobile app version
+
+Transaction history
+
+Admin dashboard for inventory management
+
+🏆 Conclusion
+
+Deque enables a fast, secure, and user-friendly checkout experience by combining barcode scanning, digital payments, and RFID-based exit validation.
+It significantly reduces checkout time and improves customer satisfaction.
