@@ -1,40 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Smart Checkout</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <meta charset="UTF-8">
+  <title>Deque – Smart Checkout</title>
 
-<header>
-  <h1>🛒 Smart Checkout</h1>
-  <p id="status">Ready to scan</p>
-  <p id="wallet">💰 Wallet Balance: ₹<span id="balance">1000</span></p>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- QR must load BEFORE script.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+</head>
+
+<body>
+<header class="header">
+  <h1>Deque</h1>
+  <p>Smart Self-Checkout</p>
+  <div>Wallet: ₹<span id="balance">1000</span></div>
+  <div id="status">Ready</div>
 </header>
 
-<div class="container">
+<main class="container">
 
-  <!-- Scanner -->
-  <div class="scanner-section">
+  <section class="card">
     <h2>Scan Product</h2>
-    <div id="scanner">Camera preview</div>
+    <div class="scanner-box">
+      <div id="scanner"></div>
+    </div>
     <button onclick="startScan()">Start Scan</button>
-  </div>
+  </section>
 
-  <!-- Cart -->
-  <div class="cart-section">
-    <h2>🧺 Cart</h2>
+  <section class="card">
+    <h2>Cart</h2>
     <ul id="cart-items"></ul>
-    <h3>Total: ₹<span id="total">0</span></h3>
-    <button onclick="payNow()">Pay using Cashless Wallet</button>
+    <strong>Total: ₹<span id="total">0</span></strong>
+
+    <button onclick="payNow()">Pay Now</button>
+
+    <h3>Payment QR</h3>
     <div id="qrBox"></div>
-  </div>
+  </section>
 
-</div>
+</main>
 
-<script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>

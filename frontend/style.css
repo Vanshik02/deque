@@ -1,56 +1,70 @@
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  background: #f4f6f9;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
 }
 
-header {
-  background: #1e293b;
+.header {
+  background: #4f46e5;
   color: white;
-  padding: 15px;
+  padding: 20px;
   text-align: center;
 }
 
-#wallet {
-  color: #22c55e;
-  font-weight: bold;
-}
-
 .container {
-  display: flex;
+  max-width: 1000px;
+  margin: 30px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
-  padding: 20px;
 }
 
-.scanner-section, .cart-section {
+.card {
   background: white;
-  padding: 15px;
-  border-radius: 8px;
-  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
 }
 
-#scanner {
-  height: 300px;
-  border: 2px dashed #2563eb;
+.scanner-box {
+  height: 260px;
+  background: black;
+  overflow: hidden;
   margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+#scanner video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 button {
-  padding: 10px;
-  background: #2563eb;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 16px;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
 }
 
-button:hover {
-  background: #1e40af;
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 
 #qrBox {
-  margin-top: 15px;
+  margin-top: 10px;
+  min-height: 220px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
