@@ -213,13 +213,11 @@ function generateQR(items, total) {
   const qrBox = document.getElementById("qrBox");
   qrBox.innerHTML = ""; // clear old QR
 
+  // Extract only RFIDs from items
+  const rfids = items.map(item => item.rfid).filter(rfid => rfid);
+
   new QRCode(qrBox, {
-    text: JSON.stringify({
-      items,
-      total,
-      payment: "CASHLESS",
-      time: new Date().toISOString(),
-    }),
+    text: JSON.stringify(rfids),
     width: 200,
     height: 200,
   });
