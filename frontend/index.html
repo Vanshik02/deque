@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Deque – Smart Checkout</title>
+    <title>Deque - Smart Checkout</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -26,6 +26,11 @@
       <!-- ========== CART SCREEN ========== -->
       <section class="screen" id="cart-screen">
         <h2>My Cart</h2>
+        
+        <div class="wallet-box">
+          Wallet Balance:
+          <strong>₹<span id="balance">10000</span></strong>
+        </div>
 
         <ul id="cart-items" class="cart-list"></ul>
 
@@ -116,7 +121,7 @@
         const interval = setInterval(() => {
           if (timeLeft <= 0) {
             clearInterval(interval);
-            label.textContent = "Expired – Invalid for RFID";
+            label.textContent = "Expired - Invalid for RFID";
             card.classList.add("expired");
             return;
           }
