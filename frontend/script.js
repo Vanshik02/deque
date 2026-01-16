@@ -1,7 +1,7 @@
 let cart = [];
-let walletBalance = 1000;
+let walletBalance = 10000;
 let scanning = false;
-let lastScannedCode = null;   // 🔥 IMPORTANT
+let lastScannedCode = null; // 🔥 IMPORTANT
 
 function setStatus(msg) {
   document.getElementById("status").innerText = msg;
@@ -23,22 +23,25 @@ function startScan() {
 
   scanner.innerHTML = "";
 
-  Quagga.init({
-    inputStream: {
-      type: "LiveStream",
-      target: scanner,
-      constraints: { facingMode: "environment" }
+  Quagga.init(
+    {
+      inputStream: {
+        type: "LiveStream",
+        target: scanner,
+        constraints: { facingMode: "environment" },
+      },
+      decoder: { readers: ["ean_reader"] },
+      locate: true,
     },
-    decoder: { readers: ["ean_reader"] },
-    locate: true
-  }, err => {
-    if (err) {
-      setStatus("❌ Camera error");
-      scanning = false;
-      return;
+    (err) => {
+      if (err) {
+        setStatus("❌ Camera error");
+        scanning = false;
+        return;
+      }
+      Quagga.start();
     }
-    Quagga.start();
-  });
+  );
 
   Quagga.onDetected(onDetected);
 }
@@ -61,8 +64,8 @@ function onDetected(result) {
   setStatus("✅ Scanned: " + barcode);
 
   fetch(`http://localhost:3000/product/${barcode}`)
-    .then(res => res.json())
-    .then(product => {
+    .then((res) => res.json())
+    .then((product) => {
       if (!product) {
         setStatus("❌ Product not found");
         return;
@@ -121,6 +124,8 @@ function payNow() {
   cart = [];
   updateCart();
   setStatus("💰 Payment successful");
+  onPaymentSuccess();
+  showScreen("pass");  
 }
 
 /* ---------- QR ---------- */
@@ -133,9 +138,9 @@ function generateQR(items, total) {
       items,
       total,
       payment: "CASHLESS",
-      time: new Date().toISOString()
+      time: new Date().toISOString(),
     }),
     width: 200,
-    height: 200
+    height: 200,
   });
 }
