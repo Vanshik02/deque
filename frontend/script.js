@@ -1,5 +1,5 @@
 let cart = [];
-let userCredits = 50000; // Initial credits
+let userCredits = 1000; // Initial credits
 let scanning = false;
 let lastScannedCode = null; // 🔥 IMPORTANT
 
