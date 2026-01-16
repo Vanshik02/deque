@@ -246,3 +246,14 @@ body {
 .bottom-nav button:hover {
   color: #111827;
 }
+
+
+.wallet-box {
+  background: #f1f5f9;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+}
