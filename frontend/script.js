@@ -1,7 +1,11 @@
 let cart = [];
-let walletBalance = 10000;
 let scanning = false;
-let lastScannedCode = null; // 🔥 IMPORTANT
+let lastScannedCode = null;
+
+/* ================= CREDIT SYSTEM ================= */
+
+let credits = 2000; // initial credits
+const CREDIT_SYMBOL = "CR";
 
 function setStatus(msg) {
   document.getElementById("status").innerText = msg;
@@ -170,22 +174,45 @@ function payNow() {
     return;
   }
 
-  const total = cart.reduce((s, p) => s + p.price, 0);
-  if (walletBalance < total) {
-    alert("Insufficient balance");
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  if (credits < total) {
+    showRefillOption(total);
     return;
   }
 
-  walletBalance -= total;
-  document.getElementById("balance").innerText = walletBalance;
+  credits -= total;
+  updateCreditsUI();
 
   generateQR(cart, total);
 
   cart = [];
   updateCart();
-  setStatus("💰 Payment successful");
+  setStatus("💳 Payment successful using credits");
   onPaymentSuccess();
-  showScreen("pass");  
+  showScreen("pass");
+}
+
+function showRefillOption(requiredAmount) {
+  const refill = confirm(
+    `❌ Insufficient Credits!\n\nRequired: ${requiredAmount} CR\nAvailable: ${credits} CR\n\nRefill credits now?`
+  );
+
+  if (refill) refillCredits();
+}
+
+function refillCredits() {
+  const amount = prompt("Enter credits to add (e.g. 500, 1000):");
+  const value = parseInt(amount);
+
+  if (isNaN(value) || value <= 0) {
+    alert("❌ Invalid amount");
+    return;
+  }
+
+  credits += value;
+  updateCreditsUI();
+  alert(`✅ ${value} CR added successfully`);
 }
 
 /* ---------- QR ---------- */
@@ -204,3 +231,9 @@ function generateQR(items, total) {
     height: 200,
   });
 }
+
+function updateCreditsUI() {
+  document.getElementById("balance").innerText = `${credits} ${CREDIT_SYMBOL}`;
+}
+
+updateCreditsUI();
