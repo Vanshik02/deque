@@ -1,47 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Deque – Smart Checkout</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Deque – Smart Checkout</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="logo">⭕ Deque</div>
+    </header>
 
-  <link rel="stylesheet" href="style.css">
+    <!-- MAIN APP -->
+    <div class="app-container">
+      <!-- ========== SCAN SCREEN ========== -->
+      <section class="screen active" id="scan-screen">
+        <div class="scanner-card">
+          <div id="scanner"></div>
+          <div class="scan-line"></div>
+          <span class="live-dot">● LIVE SCANNER</span>
+        </div>
 
-  <!-- QR must load BEFORE script.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-</head>
+        <button class="primary-btn" onclick="startScan()">Scan Barcode</button>
+      </section>
 
-<body>
-<header class="header">
-  <h1>Deque</h1>
-  <p>Smart Self-Checkout</p>
-  <div>Wallet: ₹<span id="balance">1000</span></div>
-  <div id="status">Ready</div>
-</header>
+      <!-- ========== CART SCREEN ========== -->
+      <section class="screen" id="cart-screen">
+        <h2>My Cart</h2>
 
-<main class="container">
+        <ul id="cart-items" class="cart-list"></ul>
 
-  <section class="card">
-    <h2>Scan Product</h2>
-    <div class="scanner-box">
-      <div id="scanner"></div>
+        <div class="price-box">
+          <p>Subtotal <span id="subtotal">₹0</span></p>
+          <p>Tax (8%) <span id="tax">₹0</span></p>
+          <h3>Total <span id="total">₹0</span></h3>
+        </div>
+
+        <button class="primary-btn dark" onclick="pay()">Pay Now</button>
+      </section>
+
+      <!-- ========== PASS / QR SCREEN ========== -->
+      <section class="screen" id="pass-screen">
+        <!-- STATUS -->
+        <div id="payment-status" class="pending">⏳ PAYMENT PENDING</div>
+
+        <h2>Digital Receipt</h2>
+        <p class="hint">Present valid QR at exit gate</p>
+
+        <!-- QR STACK -->
+        <div id="qr-stack"></div>
+      </section>
     </div>
-    <button onclick="startScan()">Start Scan</button>
-  </section>
 
-  <section class="card">
-    <h2>Cart</h2>
-    <ul id="cart-items"></ul>
-    <strong>Total: ₹<span id="total">0</span></strong>
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button onclick="showScreen('scan')">Scan</button>
+      <button onclick="showScreen('cart')">Cart</button>
+      <button onclick="showScreen('pass')">Pass</button>
+    </nav>
 
-    <button onclick="payNow()">Pay Now</button>
+    <!-- Libraries -->
+    <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 
-    <h3>Payment QR</h3>
-    <div id="qrBox"></div>
-  </section>
+    <script src="script.js"></script>
 
-</main>
+    <!-- UI-only screen switch -->
+    <script>
+      function showScreen(name) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(name + "-screen").classList.add("active");
+      }
+    </script>
 
-<script src="script.js"></script>
-</body>
+    <!-- PAYMENT + QR UI LOGIC (ADD THIS BELOW) -->
+    <script>
+      let QR_EXPIRY_TIME = 120; // seconds
+
+      function onPaymentSuccess() {
+        // Change status
+        const status = document.getElementById("payment-status");
+        status.textContent = "✔ PAYMENT VERIFIED";
+        status.className = "verified";
+
+        // QR card
+        const qrCard = document.createElement("div");
+        qrCard.className = "qr-card";
+
+        // Placeholder for EXISTING QR
+        const qrDiv = document.createElement("div");
+        qrCard.appendChild(qrDiv);
+
+        // Timer text
+        const timer = document.createElement("div");
+        timer.className = "qr-timer";
+        qrCard.appendChild(timer);
+
+        // Add newest QR on top
+        document.getElementById("qr-stack").prepend(qrCard);
+
+        /*
+      IMPORTANT:
+      Your backend already generates QR inside #qr
+      We ONLY move that generated QR here
+    */
+        const backendQR = document.getElementById("qr");
+        if (backendQR) backendQR.replaceWith(qrDiv);
+
+        // Start expiry countdown
+        startExpiryTimer(qrCard, timer, QR_EXPIRY_TIME);
+      }
+
+      function startExpiryTimer(card, label, timeLeft) {
+        const interval = setInterval(() => {
+          if (timeLeft <= 0) {
+            clearInterval(interval);
+            label.textContent = "Expired – Invalid for RFID";
+            card.classList.add("expired");
+            return;
+          }
+
+          const min = Math.floor(timeLeft / 60);
+          const sec = timeLeft % 60;
+          label.textContent = `Time left: ${min}:${sec
+            .toString()
+            .padStart(2, "0")}`;
+          timeLeft--;
+        }, 1000);
+      }
+    </script>
+  </body>
 </html>
