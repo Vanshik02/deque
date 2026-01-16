@@ -1,7 +1,7 @@
 let cart = [];
-let walletBalance = 1000;
+let walletBalance = 10000;
 let scanning = false;
-let lastScannedCode = null;   // 🔥 IMPORTANT
+let lastScannedCode = null; // 🔥 IMPORTANT
 
 function setStatus(msg) {
   document.getElementById("status").innerText = msg;
@@ -11,37 +11,99 @@ function setStatus(msg) {
 function startScan() {
   if (scanning) return;
   scanning = true;
-  lastScannedCode = null; // reset for new scan
+  lastScannedCode = null;
 
-  setStatus("📷 Scanning barcode...");
+  setStatus("📷 Initializing camera...");
   const scanner = document.getElementById("scanner");
+  scanner.innerHTML = "";
 
   try {
     Quagga.stop();
     Quagga.offDetected(onDetected);
   } catch (e) {}
 
-  scanner.innerHTML = "";
+  // Try environment camera first (rear camera)
+  initializeCamera("environment", scanner);
+}
 
-  Quagga.init({
-    inputStream: {
-      type: "LiveStream",
-      target: scanner,
-      constraints: { facingMode: "user" }
+function initializeCamera(facingMode, scanner) {
+  Quagga.init(
+    {
+      inputStream: {
+        type: "LiveStream",
+        target: scanner,
+        constraints: {
+          facingMode: facingMode,
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+      },
+      decoder: { readers: ["ean_reader", "code_128_reader", "code_93_reader"] },
+      locate: true,
     },
-    decoder: { readers: ["ean_reader"] },
-    locate: true
-  }, err => {
-    if (err) {
-      console.error("Camera error:", err);
-      setStatus("❌ Camera error: " + (err.message || "Permission denied or camera unavailable"));
-      scanning = false;
-      return;
+    (err) => {
+      if (err) {
+        console.error(`Camera error (${facingMode}):`, err);
+        
+        // Fallback: try user camera if environment failed
+        if (facingMode === "environment") {
+          console.log("Trying user-facing camera...");
+          setStatus("📷 Trying alternative camera...");
+          initializeCamera("user", scanner);
+        } else {
+          // Fallback: try without facing mode
+          console.log("Trying camera without constraints...");
+          initializeCameraNoConstraints(scanner);
+        }
+        return;
+      }
+      
+      setStatus("📷 Camera ready - Position barcode");
+      Quagga.start();
+      Quagga.onDetected(onDetected);
     }
-    Quagga.start();
-  });
+  );
+}
 
-  Quagga.onDetected(onDetected);
+function initializeCameraNoConstraints(scanner) {
+  Quagga.init(
+    {
+      inputStream: {
+        type: "LiveStream",
+        target: scanner,
+        constraints: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+      },
+      decoder: { readers: ["ean_reader", "code_128_reader", "code_93_reader"] },
+      locate: true,
+    },
+    (err) => {
+      if (err) {
+        console.error("All camera attempts failed:", err);
+        scanning = false;
+        setStatus("❌ Camera not accessible - Check browser permissions");
+        scanner.innerHTML = `
+          <div style="padding: 20px; color: #d32f2f; text-align: center;">
+            <p style="font-weight: bold; margin: 10px 0;">Camera Access Required</p>
+            <p style="font-size: 12px; margin: 10px 0;">Please:</p>
+            <ul style="font-size: 12px; text-align: left; display: inline-block;">
+              <li>✓ Connect a webcam</li>
+              <li>✓ Allow browser camera access</li>
+              <li>✓ Check browser settings</li>
+              <li>✓ Reload page</li>
+            </ul>
+          </div>
+        `;
+        return;
+      }
+      
+      setStatus("📷 Camera ready - Position barcode");
+      Quagga.start();
+      Quagga.onDetected(onDetected);
+    }
+  );
 }
 
 /* ---------- ON DETECT ---------- */
@@ -61,9 +123,9 @@ function onDetected(result) {
 
   setStatus("✅ Scanned: " + barcode);
 
-  fetch(`http://localhost:3000/product/${barcode}`)
-    .then(res => res.json())
-    .then(product => {
+  fetch(`http://localhost:5501/product/${barcode}`)
+    .then((res) => res.json())
+    .then((product) => {
       if (!product) {
         setStatus("❌ Product not found");
         return;
@@ -122,6 +184,8 @@ function payNow() {
   cart = [];
   updateCart();
   setStatus("💰 Payment successful");
+  onPaymentSuccess();
+  showScreen("pass");  
 }
 
 /* ---------- QR ---------- */
@@ -134,9 +198,9 @@ function generateQR(items, total) {
       items,
       total,
       payment: "CASHLESS",
-      time: new Date().toISOString()
+      time: new Date().toISOString(),
     }),
     width: 200,
-    height: 200
+    height: 200,
   });
 }
